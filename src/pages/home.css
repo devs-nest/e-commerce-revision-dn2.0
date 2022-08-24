@@ -1,0 +1,13 @@
+.product {
+  width: 300px;
+  border: 1px solid;
+}
+.product > img {
+  width: 300px;
+}
+.product__rows {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
