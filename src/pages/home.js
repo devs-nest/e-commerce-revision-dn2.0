@@ -1,30 +1,40 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from '../store';
+import { useSearchParams } from 'react-router-dom';
+import { ACTION, useDispatch, useSelector } from '../store';
 import "./home.css"
 
 
 function Home() {
-    const selectedCategory = useSelector(state => state.selectedCategory);
-    let [products, setProducts] = useState([]);
-    const filteredCategories = Array.from(new Set(products?.map(prod => prod.category)));
+    const [searchParams,] = useSearchParams();
+    const selectedCategory = searchParams.get("category");
+    const searchTerm = searchParams.get("searchterm");
+    const dispatch = useDispatch();
+    const products = useSelector(state => state.products);
+
+    let filteredProducts = selectedCategory ? products.filter(prod => prod.category === selectedCategory) : products;
+    filteredProducts = searchTerm ? filteredProducts.filter(prod => prod.title.toLowerCase().includes(searchTerm.toLowerCase())) : filteredProducts;
+    const filteredCategories = Array.from(new Set(filteredProducts?.map(prod => prod.category)));
     console.log(filteredCategories);
 
     async function fetchAllProducts() {
 
         const result = await fetch('https://fakestoreapi.com/products');
-        setProducts(await result.json())
+        dispatch({ type: ACTION.ADD_PRODUCTS, payload: await result.json() });
         console.log("re-render triggered", products);
     }
-    async function fetchProductsByCategory(category) {
-
-        const result = await fetch(`https://fakestoreapi.com/products/category/${category}`);
-        setProducts(await result.json())
-        console.log("re-render triggered", products);
+    if (!products?.length) {
+        fetchAllProducts()
     }
-    useEffect(() => {
+    // async function fetchProductsByCategory(category) {
 
-        selectedCategory === "all" ? fetchAllProducts() : fetchProductsByCategory(selectedCategory);
-    }, [selectedCategory])
+    //     const result = await fetch(`https://fakestoreapi.com/products/category/${category}`);
+    //     setProducts(await result.json())
+    //     console.log("re-render triggered", products);
+    // }
+    // useEffect(() => {
+
+    //     selectedCategory === "all" ? fetchAllProducts() : fetchProductsByCategory(selectedCategory);
+    // }, [selectedCategory])
 
 
 
@@ -40,7 +50,7 @@ function Home() {
 
     return (<div>
         {filteredCategories?.length ? filteredCategories?.map(category => (<Category key={category} title={category}>
-            {products.filter(prod => prod.category === category)?.map(prod => <Product key={prod.id} product={prod} />)}
+            {filteredProducts.filter(prod => prod.category === category)?.map(prod => <Product key={prod.id} product={prod} />)}
         </Category>)) : "No Products Found"}
     </div>
     )

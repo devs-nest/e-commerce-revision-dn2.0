@@ -21,3 +21,20 @@
 .layout__content {
   padding: 16px;
 }
+
+/* styles for filter */
+.filter {
+  display: flex;
+}
+.filter__category select {
+  text-transform: capitalize;
+}
+.filter__text {
+  width: 100%;
+}
+.filter__text div[data-reach-combobox] {
+  display: flex;
+}
+.filter__text input {
+  width: 100%;
+}
