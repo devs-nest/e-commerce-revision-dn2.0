@@ -21,18 +21,39 @@ import {
 } from "@reach/combobox";
 import "@reach/combobox/styles.css";
 import { useLocation } from 'react-router-dom';
+import { getItemCount } from './utils';
+import Checkout from './pages/checkout';
+import { useAuth } from './firebase/auth';
+import SignUp from './pages/signup';
+import { Navigate } from 'react-router-dom';
+
 
 function App() {
   return (<Routes>
     <Route element={<Layout />}>
       <Route path='/' element={<Home />}></Route>
       <Route path='/cart' element={<Cart />}></Route>
+      <Route path='/checkout' element={
+        <ProtectedRoute>
+          <Checkout />
+        </ProtectedRoute>
+      }></Route>
+
     </Route>
     <Route path='/login' element={<Login />} />
+    <Route path='/signup' element={<SignUp />} />
   </Routes>
 
 
   );
+}
+
+function ProtectedRoute({ children }) {
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/login" />
+  }
+  return children;
 }
 
 function ComboBox({ items, onSelectionChange, onSearch }) {
@@ -141,7 +162,26 @@ function SearchBar() {
   </div>)
 }
 
+function CartInfo() {
+  const cartItems = useSelector(state => state.cart);
+  const count = getItemCount(cartItems);
+  console.log(cartItems);
+  return <div className='cart__info'>
+    <span className='count'>{count}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="container">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+    </svg>
+  </div>
+
+}
+
 function Header() {
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+  const signOutCurrentUser = async () => {
+    await signOut();
+    navigate("/login");
+  }
   return (<nav className='header'>
     <section className='header__title'>
       <Link to="/">
@@ -152,8 +192,20 @@ function Header() {
       <SearchBar />
     </section>
     <section className='header__navigation'>
-      Welcome user
-      <Link to="cart">Cart</Link>
+      <ul className='header__navigation__links'>
+        <li>
+          {user ? `Hello, ${user?.displayName ?? user.email}` : "Hello, Sign In"}
+        </li>
+        <li>
+          {user ? <button onClick={signOutCurrentUser}>Signout</button> : null}
+        </li>
+        <li>
+          <Link to="cart">
+            <CartInfo />
+          </Link>
+        </li>
+      </ul>
+
     </section>
 
     {/* <Link to="/">Home</Link>
