@@ -6,13 +6,9 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 import { createContext, useContext, useEffect, useState } from "react";
 
 // Your web app's Firebase configuration
+
 const firebaseConfig = {
-    apiKey: "AIzaSyBMMOGZKU_L-Lg5pbytfkzJZMTQpBaznRE",
-    authDomain: "devsnest-e393c.firebaseapp.com",
-    projectId: "devsnest-e393c",
-    storageBucket: "devsnest-e393c.appspot.com",
-    messagingSenderId: "188910613743",
-    appId: "1:188910613743:web:4792c901a6afc82835d71a"
+    // add your config object here
 };
 
 // Initialize Firebase
